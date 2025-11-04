@@ -1,3 +1,5 @@
+import 'package:uuid/uuid.dart';
+
 class Expense {
   String id;
   String category;
@@ -5,9 +7,9 @@ class Expense {
   DateTime date;
 
   Expense({
-    required this.id,
+    String? id,
     required this.category,
     required this.value,
     required this.date,
-  });
+  }) : id = id ?? const Uuid().v4();
 }

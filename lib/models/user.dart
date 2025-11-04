@@ -1,9 +1,11 @@
 class User {
   final String username;
-  final String password;
+  String passwordHash;
+  String? email;
 
   User({
     required this.username,
-    required this.password,
+    required this.passwordHash,
+    this.email,
   });
 }

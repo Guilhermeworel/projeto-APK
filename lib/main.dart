@@ -15,7 +15,6 @@ void main() {
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -27,9 +26,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       home: Consumer<AppState>(
         builder: (context, appState, _) {
-          return appState.loggedUser == null
-              ? const LoginScreen()
-              : const HomeScreen();
+          return appState.loggedUser == null ? const LoginScreen() : const HomeScreen();
         },
       ),
     );
