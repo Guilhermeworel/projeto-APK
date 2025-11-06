@@ -1,53 +1,117 @@
 import 'package:flutter/material.dart';
+import 'month_detail_screen.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
-  final List<String> months = const [
-    'Janeiro', 'Fevereiro', 'Março', 'Abril',
-    'Maio', 'Junho', 'Julho', 'Agosto',
-    'Setembro', 'Outubro', 'Novembro', 'Dezembro'
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  int selectedYear = DateTime.now().year;
+  final List<String> months = [
+    'Janeiro',
+    'Fevereiro',
+    'Março',
+    'Abril',
+    'Maio',
+    'Junho',
+    'Julho',
+    'Agosto',
+    'Setembro',
+    'Outubro',
+    'Novembro',
+    'Dezembro'
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Meus Meses'),
+        title: const Text('Controle Financeiro'),
         centerTitle: true,
         actions: [
           IconButton(
-            icon: const Icon(Icons.logout),
+            icon: const Icon(Icons.bar_chart_rounded),
+            tooltip: 'Ver Relatório Geral',
             onPressed: () {
-              Navigator.pushReplacementNamed(context, '/login');
+              Navigator.pushNamed(context, '/report');
             },
           ),
         ],
       ),
-      body: ListView.builder(
-        padding: const EdgeInsets.all(12),
-        itemCount: months.length,
-        itemBuilder: (context, index) {
-          final month = months[index];
-          return Card(
-            child: ListTile(
-              title: Text(month),
-              trailing: const Icon(Icons.arrow_forward_ios),
-              onTap: () {
-                Navigator.pushNamed(
-                  context,
-                  '/month_detail',
-                  arguments: month,
-                );
-              },
+      body: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Seleção de ano
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  'Selecione o ano:',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                DropdownButton<int>(
+                  value: selectedYear,
+                  items: List.generate(
+                    5,
+                        (i) {
+                      final year = 2023 + i;
+                      return DropdownMenuItem(value: year, child: Text('$year'));
+                    },
+                  ),
+                  onChanged: (value) {
+                    if (value != null) {
+                      setState(() {
+                        selectedYear = value;
+                      });
+                    }
+                  },
+                ),
+              ],
             ),
-          );
-        },
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {},
-        label: const Text('Adicionar Mês'),
-        icon: const Icon(Icons.add),
+            const SizedBox(height: 16),
+            const Text(
+              'Meses disponíveis:',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+
+            // Lista de meses
+            Expanded(
+              child: ListView.builder(
+                itemCount: months.length,
+                itemBuilder: (context, index) {
+                  final month = months[index];
+                  return Card(
+                    elevation: 2,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: ListTile(
+                      title: Text(month),
+                      trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 18),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => MonthDetailScreen(
+                              monthName: month,
+                              year: selectedYear,
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

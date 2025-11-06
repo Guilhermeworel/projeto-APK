@@ -3,6 +3,8 @@ import 'screens/login_screen.dart';
 import 'screens/register_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/month_detail_screen.dart';
+import 'screens/income_screen.dart';
+import 'screens/report_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -27,13 +29,18 @@ class MyApp extends StatelessWidget {
         '/login': (_) => const LoginScreen(),
         '/register': (_) => const RegisterScreen(),
         '/home': (_) => const HomeScreen(),
+        '/income': (_) => const IncomeScreen(),
+        '/report': (_) => const ReportScreen(),
       },
       onGenerateRoute: (settings) {
         if (settings.name == '/month_detail') {
           final args = settings.arguments;
-          if (args is String) {
+          if (args is Map<String, dynamic>) {
             return MaterialPageRoute(
-              builder: (_) => MonthDetailScreen(monthName: args),
+              builder: (_) => MonthDetailScreen(
+                monthName: args['month'],
+                year: args['year'],
+              ),
             );
           } else {
             return MaterialPageRoute(
