@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class LoginScreen extends StatelessWidget {
-  const LoginScreen({super.key});
+class RegisterScreen extends StatelessWidget {
+  const RegisterScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -10,7 +10,7 @@ class LoginScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Login'),
+        title: const Text('Cadastro'),
         centerTitle: true,
       ),
       body: Padding(
@@ -19,8 +19,8 @@ class LoginScreen extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const Text(
-              'Bem-vindo!',
-              style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+              'Crie sua conta',
+              style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 20),
             TextField(
@@ -42,16 +42,10 @@ class LoginScreen extends StatelessWidget {
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
-                Navigator.pushReplacementNamed(context, '/home');
+                Navigator.pop(context);
               },
-              child: const Text('Entrar'),
+              child: const Text('Cadastrar'),
             ),
-            TextButton(
-              onPressed: () {
-                Navigator.pushNamed(context, '/register');
-              },
-              child: const Text('Criar conta'),
-            )
           ],
         ),
       ),
