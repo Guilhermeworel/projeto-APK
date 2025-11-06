@@ -39,6 +39,14 @@ class _HomeScreenState extends State<HomeScreen> {
               Navigator.pushNamed(context, '/report');
             },
           ),
+          IconButton(
+            icon: const Icon(Icons.logout_rounded),
+            tooltip: 'Sair',
+            onPressed: () {
+              // Simplesmente volta pra tela de login
+              Navigator.pushReplacementNamed(context, '/login');
+            },
+          ),
         ],
       ),
       body: Padding(
@@ -60,7 +68,10 @@ class _HomeScreenState extends State<HomeScreen> {
                     5,
                         (i) {
                       final year = 2023 + i;
-                      return DropdownMenuItem(value: year, child: Text('$year'));
+                      return DropdownMenuItem(
+                        value: year,
+                        child: Text('$year'),
+                      );
                     },
                   ),
                   onChanged: (value) {
@@ -93,7 +104,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     child: ListTile(
                       title: Text(month),
-                      trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 18),
+                      trailing:
+                      const Icon(Icons.arrow_forward_ios_rounded, size: 18),
                       onTap: () {
                         Navigator.push(
                           context,
