@@ -5,7 +5,11 @@ class MonthDetailScreen extends StatefulWidget {
   final String monthName;
   final int year;
 
-  const MonthDetailScreen({super.key, required this.monthName, required this.year});
+  const MonthDetailScreen({
+    super.key,
+    required this.monthName,
+    required this.year,
+  });
 
   @override
   State<MonthDetailScreen> createState() => _MonthDetailScreenState();
@@ -13,6 +17,7 @@ class MonthDetailScreen extends StatefulWidget {
 
 class _MonthDetailScreenState extends State<MonthDetailScreen> {
   final List<Map<String, dynamic>> expenses = [];
+  double? income; // Rendimento do mês
   final TextEditingController nameController = TextEditingController();
   final TextEditingController amountController = TextEditingController();
   bool showAddExpense = false;
@@ -35,22 +40,103 @@ class _MonthDetailScreenState extends State<MonthDetailScreen> {
     }
   }
 
+  // Função para atualizar o rendimento após retornar da tela IncomeScreen
+  Future<void> navigateToIncomeScreen() async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const IncomeScreen()),
+    );
+
+    if (result != null && result is double) {
+      setState(() {
+        income = result;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text('${widget.monthName} / ${widget.year}'),
+        centerTitle: true,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Exibir rendimento atual
+            if (income != null)
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(14),
+                margin: const EdgeInsets.only(bottom: 10),
+                decoration: BoxDecoration(
+                  color: Colors.blue.shade50,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.blue.shade300),
+                ),
+                child: Text(
+                  'Rendimento: R\$ ${income!.toStringAsFixed(2)}',
+                  style: TextStyle(
+                    color: Colors.blue.shade900,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                  ),
+                ),
+              ),
+
             const Text(
               'Gastos do mês',
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 10),
+
+            // Campo de adicionar gasto
+            if (showAddExpense)
+              Column(
+                children: [
+                  TextField(
+                    controller: nameController,
+                    decoration: const InputDecoration(
+                      labelText: 'Descrição do gasto',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  TextField(
+                    controller: amountController,
+                    keyboardType: TextInputType.number,
+                    decoration: const InputDecoration(
+                      labelText: 'Valor em R\$',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      TextButton(
+                        onPressed: () {
+                          setState(() => showAddExpense = false);
+                        },
+                        child: const Text('Cancelar'),
+                      ),
+                      ElevatedButton.icon(
+                        onPressed: addExpense,
+                        icon: const Icon(Icons.check),
+                        label: const Text('Salvar'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.green,
+                          foregroundColor: Colors.white,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                ],
+              ),
 
             // Lista de gastos
             Expanded(
@@ -66,124 +152,69 @@ class _MonthDetailScreenState extends State<MonthDetailScreen> {
                 itemBuilder: (context, index) {
                   final exp = expenses[index];
                   return Card(
-                    elevation: 3,
+                    elevation: 2,
                     margin: const EdgeInsets.symmetric(vertical: 6),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
+                      borderRadius: BorderRadius.circular(12),
                     ),
                     child: ListTile(
-                      leading: const Icon(Icons.attach_money_rounded,
-                          color: Colors.green),
+                      leading: const Icon(Icons.attach_money, color: Colors.green),
                       title: Text(exp['name']),
                       subtitle: Text(
-                          'Data: ${exp['date'].day}/${exp['date'].month}'),
-                      trailing:
-                      Text('R\$ ${exp['amount'].toStringAsFixed(2)}'),
+                          'Data: ${exp['date'].day}/${exp['date'].month}/${exp['date'].year}'),
+                      trailing: Text(
+                        'R\$ ${exp['amount'].toStringAsFixed(2)}',
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
                     ),
                   );
                 },
               ),
             ),
 
-            if (showAddExpense)
-              AnimatedContainer(
-                duration: const Duration(milliseconds: 300),
-                curve: Curves.easeInOut,
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.green.shade50,
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Column(
-                  children: [
-                    TextField(
-                      controller: nameController,
-                      decoration: const InputDecoration(
-                        labelText: 'Descrição do gasto',
-                        border: OutlineInputBorder(),
+            // Botões lado a lado
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                Expanded(
+                  child: ElevatedButton.icon(
+                    onPressed: () {
+                      setState(() {
+                        showAddExpense = !showAddExpense;
+                      });
+                    },
+                    icon: Icon(showAddExpense ? Icons.close : Icons.add),
+                    label: Text(showAddExpense ? 'Fechar' : 'Adicionar Gasto'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green.shade700,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
                       ),
                     ),
-                    const SizedBox(height: 12),
-                    TextField(
-                      controller: amountController,
-                      keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(
-                        labelText: 'Valor em R\$',
-                        border: OutlineInputBorder(),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: ElevatedButton.icon(
+                    onPressed: navigateToIncomeScreen,
+                    icon: const Icon(Icons.account_balance_wallet_rounded),
+                    label: const Text('Informar Rendimento'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blue.shade700,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 12), // menor altura
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
                       ),
                     ),
-                    const SizedBox(height: 12),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        ElevatedButton.icon(
-                          onPressed: addExpense,
-                          icon: const Icon(Icons.check),
-                          label: const Text('Salvar'),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.green.shade600,
-                            foregroundColor: Colors.white,
-                          ),
-                        ),
-                        TextButton(
-                          onPressed: () {
-                            setState(() {
-                              showAddExpense = false;
-                            });
-                          },
-                          child: const Text('Cancelar'),
-                        ),
-                      ],
-                    ),
-                  ],
+                  ),
                 ),
-              ),
+              ],
+            ),
           ],
         ),
-      ),
-
-      // Botões na parte inferior
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButton: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          ElevatedButton.icon(
-            onPressed: () {
-              setState(() {
-                showAddExpense = !showAddExpense;
-              });
-            },
-            icon: Icon(showAddExpense ? Icons.close : Icons.add),
-            label: Text(showAddExpense ? 'Fechar' : 'Adicionar Gasto'),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.green.shade600,
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-              ),
-            ),
-          ),
-          const SizedBox(width: 10),
-          ElevatedButton.icon(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const IncomeScreen()),
-              );
-            },
-            icon: const Icon(Icons.account_balance_wallet_rounded),
-            label: const Text('Informar Rendimento'),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.blue.shade600,
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-              ),
-            ),
-          ),
-        ],
       ),
     );
   }

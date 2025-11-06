@@ -34,7 +34,8 @@ class IncomeScreen extends StatelessWidget {
             const SizedBox(height: 20),
             ElevatedButton.icon(
               onPressed: () {
-                Navigator.pop(context);
+                final value = double.tryParse(incomeController.text);
+                Navigator.pop(context, value);
               },
               icon: const Icon(Icons.check),
               label: const Text('Salvar'),
