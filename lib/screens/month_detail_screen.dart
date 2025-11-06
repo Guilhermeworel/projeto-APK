@@ -40,7 +40,6 @@ class _MonthDetailScreenState extends State<MonthDetailScreen> {
     }
   }
 
-  // Função para atualizar o rendimento após retornar da tela IncomeScreen
   Future<void> navigateToIncomeScreen() async {
     final result = await Navigator.push(
       context,
@@ -54,6 +53,11 @@ class _MonthDetailScreenState extends State<MonthDetailScreen> {
     }
   }
 
+  double get totalExpenses =>
+      expenses.fold(0.0, (sum, e) => sum + (e['amount'] as double));
+
+  double get balance => (income ?? 0) - totalExpenses;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -66,7 +70,7 @@ class _MonthDetailScreenState extends State<MonthDetailScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Exibir rendimento atual
+            // Exibir rendimento e balanço
             if (income != null)
               Container(
                 width: double.infinity,
@@ -77,13 +81,36 @@ class _MonthDetailScreenState extends State<MonthDetailScreen> {
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(color: Colors.blue.shade300),
                 ),
-                child: Text(
-                  'Rendimento: R\$ ${income!.toStringAsFixed(2)}',
-                  style: TextStyle(
-                    color: Colors.blue.shade900,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
-                  ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Rendimento: R\$ ${income!.toStringAsFixed(2)}',
+                      style: TextStyle(
+                        color: Colors.blue.shade900,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      'Gastos: R\$ ${totalExpenses.toStringAsFixed(2)}',
+                      style: const TextStyle(
+                        color: Colors.redAccent,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Saldo: R\$ ${balance.toStringAsFixed(2)}',
+                      style: TextStyle(
+                        color: balance >= 0 ? Colors.green.shade800 : Colors.red.shade800,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
                 ),
               ),
 
@@ -93,7 +120,6 @@ class _MonthDetailScreenState extends State<MonthDetailScreen> {
             ),
             const SizedBox(height: 10),
 
-            // Campo de adicionar gasto
             if (showAddExpense)
               Column(
                 children: [
@@ -138,7 +164,6 @@ class _MonthDetailScreenState extends State<MonthDetailScreen> {
                 ],
               ),
 
-            // Lista de gastos
             Expanded(
               child: expenses.isEmpty
                   ? const Center(
@@ -158,7 +183,8 @@ class _MonthDetailScreenState extends State<MonthDetailScreen> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: ListTile(
-                      leading: const Icon(Icons.attach_money, color: Colors.green),
+                      leading:
+                      const Icon(Icons.attach_money, color: Colors.green),
                       title: Text(exp['name']),
                       subtitle: Text(
                           'Data: ${exp['date'].day}/${exp['date'].month}/${exp['date'].year}'),
@@ -172,7 +198,7 @@ class _MonthDetailScreenState extends State<MonthDetailScreen> {
               ),
             ),
 
-            // Botões lado a lado
+            // Botões lado a lado (altura ajustada)
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
@@ -188,7 +214,7 @@ class _MonthDetailScreenState extends State<MonthDetailScreen> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.green.shade700,
                       foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      padding: const EdgeInsets.symmetric(vertical: 10),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(14),
                       ),
@@ -204,7 +230,8 @@ class _MonthDetailScreenState extends State<MonthDetailScreen> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.blue.shade700,
                       foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 12), // menor altura
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 10), // altura reduzida
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(14),
                       ),
