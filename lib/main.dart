@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'database/database.dart'; // <-- importe o seu arquivo do DB
+import 'database/database.dart'; // caminho corrigido
 import 'screens/login_screen.dart';
 import 'screens/register_screen.dart';
 import 'screens/home_screen.dart';
@@ -33,7 +33,7 @@ class MyApp extends StatelessWidget {
       initialRoute: '/login',
       routes: {
         '/login': (_) => const LoginScreen(),
-        '/register': (_) => const RegisterScreen(),
+        '/register': (_) => RegisterScreen(),   // <-- sem const
         '/home': (_) => const HomeScreen(),
         '/income': (_) => const IncomeScreen(),
         '/report': (_) => const ReportScreen(),

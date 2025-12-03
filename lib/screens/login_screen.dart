@@ -1,13 +1,37 @@
 import 'package:flutter/material.dart';
+import 'package:untitled/database/database.dart';
 
-class LoginScreen extends StatelessWidget {
+class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final TextEditingController usernameController = TextEditingController();
-    final TextEditingController passwordController = TextEditingController();
+  State<LoginScreen> createState() => _LoginScreenState();
+}
 
+class _LoginScreenState extends State<LoginScreen> {
+  final emailController = TextEditingController();
+  final passwordController = TextEditingController();
+
+  Future<void> login() async {
+    final db = DatabaseHelper.instance;
+
+    final user = await db.getUser(
+      emailController.text,
+      passwordController.text,
+    );
+
+    if (user == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Usuário ou senha incorretos")),
+      );
+      return;
+    }
+
+    Navigator.pushReplacementNamed(context, '/home');
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Login'),
@@ -24,9 +48,9 @@ class LoginScreen extends StatelessWidget {
             ),
             const SizedBox(height: 20),
             TextField(
-              controller: usernameController,
+              controller: emailController,
               decoration: const InputDecoration(
-                labelText: 'Usuário',
+                labelText: 'Email',
                 border: OutlineInputBorder(),
               ),
             ),
@@ -41,9 +65,7 @@ class LoginScreen extends StatelessWidget {
             ),
             const SizedBox(height: 20),
             ElevatedButton(
-              onPressed: () {
-                Navigator.pushReplacementNamed(context, '/home');
-              },
+              onPressed: login,
               child: const Text('Entrar'),
             ),
             TextButton(

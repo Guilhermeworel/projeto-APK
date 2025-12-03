@@ -1,51 +1,49 @@
 import 'package:flutter/material.dart';
+import 'package:untitled/database/database.dart';
+import 'login_screen.dart';
 
-class RegisterScreen extends StatelessWidget {
-  const RegisterScreen({super.key});
+class RegisterScreen extends StatefulWidget {
+  @override
+  _RegisterScreenState createState() => _RegisterScreenState();
+}
+
+class _RegisterScreenState extends State<RegisterScreen> {
+  final usernameController = TextEditingController();
+  final emailController = TextEditingController();
+  final passwordController = TextEditingController();
+
+  Future<void> register() async {
+    final db = DatabaseHelper.instance;
+
+    await db.createUser(
+      usernameController.text,
+      emailController.text,
+      passwordController.text,
+    );
+
+    ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Conta criada com sucesso!"))
+    );
+
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (_) => LoginScreen()),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
-    final TextEditingController usernameController = TextEditingController();
-    final TextEditingController passwordController = TextEditingController();
-
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Cadastro'),
-        centerTitle: true,
-      ),
+      appBar: AppBar(title: Text("Criar conta")),
       body: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: EdgeInsets.all(20),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text(
-              'Crie sua conta',
-              style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 20),
-            TextField(
-              controller: usernameController,
-              decoration: const InputDecoration(
-                labelText: 'Usuário',
-                border: OutlineInputBorder(),
-              ),
-            ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: passwordController,
-              obscureText: true,
-              decoration: const InputDecoration(
-                labelText: 'Senha',
-                border: OutlineInputBorder(),
-              ),
-            ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              child: const Text('Cadastrar'),
-            ),
+            TextField(controller: usernameController, decoration: InputDecoration(labelText: "Nome")),
+            TextField(controller: emailController, decoration: InputDecoration(labelText: "Email")),
+            TextField(controller: passwordController, decoration: InputDecoration(labelText: "Senha"), obscureText: true),
+            SizedBox(height: 20),
+            ElevatedButton(onPressed: register, child: Text("Registrar")),
           ],
         ),
       ),
