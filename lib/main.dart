@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'database/database.dart'; // <-- importe o seu arquivo do DB
 import 'screens/login_screen.dart';
 import 'screens/register_screen.dart';
 import 'screens/home_screen.dart';
@@ -6,7 +7,12 @@ import 'screens/month_detail_screen.dart';
 import 'screens/income_screen.dart';
 import 'screens/report_screen.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Inicializar o banco antes de abrir o app
+  await DatabaseHelper.instance.initDatabase();
+
   runApp(const MyApp());
 }
 
