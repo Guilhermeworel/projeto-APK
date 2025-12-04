@@ -32,6 +32,15 @@ class _HomeScreenState extends State<HomeScreen> {
         title: const Text('Controle Financeiro'),
         centerTitle: true,
         actions: [
+          // 👉 Botão de Perfil (NOVO)
+          IconButton(
+            icon: const Icon(Icons.person_rounded),
+            tooltip: 'Perfil',
+            onPressed: () {
+              Navigator.pushNamed(context, '/profile');
+            },
+          ),
+
           IconButton(
             icon: const Icon(Icons.bar_chart_rounded),
             tooltip: 'Ver Relatório Geral',
@@ -43,7 +52,6 @@ class _HomeScreenState extends State<HomeScreen> {
             icon: const Icon(Icons.logout_rounded),
             tooltip: 'Sair',
             onPressed: () {
-              // Simplesmente volta pra tela de login
               Navigator.pushReplacementNamed(context, '/login');
             },
           ),
@@ -91,7 +99,6 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             const SizedBox(height: 8),
 
-            // Lista de meses
             Expanded(
               child: ListView.builder(
                 itemCount: months.length,
@@ -104,8 +111,10 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     child: ListTile(
                       title: Text(month),
-                      trailing:
-                      const Icon(Icons.arrow_forward_ios_rounded, size: 18),
+                      trailing: const Icon(
+                        Icons.arrow_forward_ios_rounded,
+                        size: 18,
+                      ),
                       onTap: () {
                         Navigator.push(
                           context,
