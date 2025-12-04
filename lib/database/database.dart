@@ -15,46 +15,46 @@ class DatabaseHelper {
     final dbPath = await getDatabasesPath();
     final path = join(dbPath, fileName);
 
-
     return await openDatabase(
-    path,
-    version: 1,
-    onCreate: (db, version) async {
-    await db.execute('''
-      CREATE TABLE users (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        username TEXT NOT NULL,
-        email TEXT NOT NULL UNIQUE,
-        password TEXT NOT NULL
-      )
-    ''');
+      path,
+      version: 1,
+      onCreate: (db, version) async {
+        // Tabela de usuários
+        await db.execute('''
+          CREATE TABLE users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT NOT NULL,
+            email TEXT NOT NULL UNIQUE,
+            password TEXT NOT NULL
+          )
+        ''');
 
-    await db.execute('''
-      CREATE TABLE incomes (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        user_id INTEGER,
-        year INTEGER,
-        month INTEGER,
-        income REAL,
-        UNIQUE(user_id, year, month)
-      )
-    ''');
+        // Rendimento de cada mês
+        await db.execute('''
+          CREATE TABLE incomes (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER,
+            year INTEGER,
+            month INTEGER,
+            income REAL,
+            UNIQUE(user_id, year, month)
+          )
+        ''');
 
-    await db.execute('''
-      CREATE TABLE expenses (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        user_id INTEGER,
-        year INTEGER,
-        month INTEGER,
-        name TEXT,
-        amount REAL,
-        date TEXT
-      )
-    ''');
-    },
+        // Gastos de cada mês
+        await db.execute('''
+          CREATE TABLE expenses (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER,
+            year INTEGER,
+            month INTEGER,
+            name TEXT,
+            amount REAL,
+            date TEXT
+          )
+        ''');
+      },
     );
-
-
   }
 
   Future<Database> get database async {
@@ -63,9 +63,9 @@ class DatabaseHelper {
     return _database!;
   }
 
-// -------------------------------------------------------
-// USUÁRIOS
-// -------------------------------------------------------
+  // -------------------------------------------------------
+  // USUÁRIOS
+  // -------------------------------------------------------
 
   Future<int> createUser(String username, String email, String password) async {
     final db = await database;
@@ -91,12 +91,43 @@ class DatabaseHelper {
     return null;
   }
 
-// -------------------------------------------------------
-// RENDIMENTO
-// -------------------------------------------------------
+  /// Busca usuário por id — retorna null se não encontrado
+  Future<Map<String, dynamic>?> getUserById(int id) async {
+    final db = await database;
+    final res = await db.query(
+      "users",
+      where: "id = ?",
+      whereArgs: [id],
+      limit: 1,
+    );
+
+    if (res.isNotEmpty) return res.first;
+    return null;
+  }
+
+  /// Atualiza nome e email do usuário. Retorna número de linhas afetadas.
+  Future<int> updateUser(int id, String username, String email) async {
+    final db = await database;
+    return await db.update(
+      "users",
+      {
+        "username": username,
+        "email": email,
+      },
+      where: "id = ?",
+      whereArgs: [id],
+      conflictAlgorithm: ConflictAlgorithm.fail,
+    );
+  }
+
+  // -------------------------------------------------------
+  // RENDIMENTO DO MÊS
+  // -------------------------------------------------------
 
   Future<void> saveIncome(int userId, int year, int month, double income) async {
     final db = await database;
+
+    // try insert; on conflict replace the income
     await db.insert(
       "incomes",
       {
@@ -111,53 +142,64 @@ class DatabaseHelper {
 
   Future<double?> getIncome(int userId, int year, int month) async {
     final db = await database;
+
     final res = await db.query(
       "incomes",
       where: "user_id = ? AND year = ? AND month = ?",
       whereArgs: [userId, year, month],
+      limit: 1,
     );
-    if (res.isNotEmpty) return res.first["income"] as double;
+
+    if (res.isNotEmpty) {
+      final val = res.first["income"];
+      if (val is int) return val.toDouble();
+      if (val is double) return val;
+      if (val is num) return val.toDouble();
+    }
     return null;
   }
 
-// -------------------------------------------------------
-// GASTOS
-// -------------------------------------------------------
+  // -------------------------------------------------------
+  // GASTOS
+  // -------------------------------------------------------
 
   Future<int> addExpense(
-      int userId, int year, int month, String name, double amount, String date) async {
+      int userId,
+      int year,
+      int month,
+      String name,
+      double amount,
+      String date,
+      ) async {
     final db = await database;
 
-
     return await db.insert(
-    "expenses",
-    {
-    "user_id": userId,
-    "year": year,
-    "month": month,
-    "name": name,
-    "amount": amount,
-    "date": date,
-    },
+      "expenses",
+      {
+        "user_id": userId,
+        "year": year,
+        "month": month,
+        "name": name,
+        "amount": amount,
+        "date": date,
+      },
     );
-
-
   }
 
   Future<List<Map<String, dynamic>>> getExpensesByMonth(
-      int userId, int year, int month) async {
+      int userId,
+      int year,
+      int month,
+      ) async {
     final db = await database;
 
-
     return await db.query(
-    "expenses",
-    where: "user_id = ? AND year = ? AND month = ?",
-    whereArgs: [userId, year, month],
-    orderBy: "date DESC",
+      "expenses",
+      where: "user_id = ? AND year = ? AND month = ?",
+      whereArgs: [userId, year, month],
+      orderBy: "date DESC",
     );
-
-
-    }
+  }
 
   Future<int> deleteExpense(int id) async {
     final db = await database;
@@ -176,18 +218,15 @@ class DatabaseHelper {
       ) async {
     final db = await database;
 
-
     return await db.update(
-    "expenses",
-    {
-    "name": name,
-    "amount": amount,
-    "date": date,
-    },
-    where: "id = ?",
-    whereArgs: [id],
+      "expenses",
+      {
+        "name": name,
+        "amount": amount,
+        "date": date,
+      },
+      where: "id = ?",
+      whereArgs: [id],
     );
-
-
   }
 }

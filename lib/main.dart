@@ -7,6 +7,7 @@ import 'screens/home_screen.dart';
 import 'screens/month_detail_screen.dart';
 import 'screens/income_screen.dart';
 import 'screens/report_screen.dart';
+import 'screens/profile_screen.dart';  // ← ADICIONADO
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -34,7 +35,7 @@ class MyApp extends StatelessWidget {
       ),
 
       /// Se está logado → vai para home
-      /// Se não está → vai para login
+      /// Se não → vai para login
       initialRoute:
       UserSession.currentUserId == null ? '/login' : '/home',
 
@@ -43,6 +44,7 @@ class MyApp extends StatelessWidget {
         '/register': (_) => RegisterScreen(),
         '/home': (_) => const HomeScreen(),
         '/report': (_) => const ReportScreen(),
+        '/profile': (_) => const ProfileScreen(),   // ← ADICIONADA
       },
 
       onGenerateRoute: (settings) {
