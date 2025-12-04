@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:untitled/database/database.dart';
+import 'package:untitled/database/user_session.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -15,28 +16,31 @@ class _LoginScreenState extends State<LoginScreen> {
   Future<void> login() async {
     final db = DatabaseHelper.instance;
 
+
     final user = await db.getUser(
-      emailController.text,
-      passwordController.text,
+    emailController.text,
+    passwordController.text,
     );
 
     if (user == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Usuário ou senha incorretos")),
-      );
-      return;
+    ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(content: Text("Usuário ou senha incorretos")),
+    );
+    return;
     }
 
+// Salva sessão do usuário
+    await UserSession.saveUser(user["id"]);
+
     Navigator.pushReplacementNamed(context, '/home');
+
+
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Login'),
-        centerTitle: true,
-      ),
+      appBar: AppBar(title: const Text('Login')),
       body: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(

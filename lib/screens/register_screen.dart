@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:untitled/database/database.dart';
+import 'package:untitled/database/user_session.dart';
 import 'login_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -15,21 +16,24 @@ class _RegisterScreenState extends State<RegisterScreen> {
   Future<void> register() async {
     final db = DatabaseHelper.instance;
 
-    await db.createUser(
-      usernameController.text,
-      emailController.text,
-      passwordController.text,
+
+    final id = await db.createUser(
+    usernameController.text,
+    emailController.text,
+    passwordController.text,
     );
+
+// Salva o usuário automaticamente
+    await UserSession.saveUser(id);
 
     ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Conta criada com sucesso!"))
+    SnackBar(content: Text("Conta criada com sucesso!")),
     );
 
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (_) => LoginScreen()),
-    );
-  }
+    Navigator.pushReplacementNamed(context, '/home');
+
+
+    }
 
   @override
   Widget build(BuildContext context) {
@@ -39,11 +43,24 @@ class _RegisterScreenState extends State<RegisterScreen> {
         padding: EdgeInsets.all(20),
         child: Column(
           children: [
-            TextField(controller: usernameController, decoration: InputDecoration(labelText: "Nome")),
-            TextField(controller: emailController, decoration: InputDecoration(labelText: "Email")),
-            TextField(controller: passwordController, decoration: InputDecoration(labelText: "Senha"), obscureText: true),
+            TextField(
+              controller: usernameController,
+              decoration: InputDecoration(labelText: "Nome"),
+            ),
+            TextField(
+              controller: emailController,
+              decoration: InputDecoration(labelText: "Email"),
+            ),
+            TextField(
+              controller: passwordController,
+              decoration: InputDecoration(labelText: "Senha"),
+              obscureText: true,
+            ),
             SizedBox(height: 20),
-            ElevatedButton(onPressed: register, child: Text("Registrar")),
+            ElevatedButton(
+              onPressed: register,
+              child: Text("Registrar"),
+            ),
           ],
         ),
       ),
