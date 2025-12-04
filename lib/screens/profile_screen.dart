@@ -2,9 +2,14 @@ import 'package:flutter/material.dart';
 import '../database/user_session.dart';
 import '../database/database.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
 
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     final user = UserSession.currentUser;
@@ -28,11 +33,15 @@ class ProfileScreen extends StatelessWidget {
             const SizedBox(height: 24),
 
             ElevatedButton.icon(
-              onPressed: () {
-                Navigator.push(
+              onPressed: () async {
+                // Vai para a tela de edição
+                await Navigator.push(
                   context,
                   MaterialPageRoute(builder: (_) => const _EditProfileScreen()),
                 );
+
+                // 🔥 Atualiza a tela ao voltar
+                setState(() {});
               },
               icon: const Icon(Icons.edit),
               label: const Text('Editar perfil'),
@@ -56,7 +65,7 @@ class ProfileScreen extends StatelessWidget {
 }
 
 //////////////////////////////////////////////
-///  TELA INTERNA PARA EDITAR PERFIL
+///  TELA INTERNA PARA EDITAR PERFIL (MESMO ARQUIVO)
 //////////////////////////////////////////////
 
 class _EditProfileScreen extends StatefulWidget {
@@ -87,10 +96,11 @@ class _EditProfileScreenState extends State<_EditProfileScreen> {
         emailController.text,
       );
 
-      // atualiza a sessão
+      // Atualiza sessão com os novos dados
       await UserSession.loadUser();
 
-      Navigator.pop(context); // volta pro perfil
+      // Volta para a tela de perfil
+      Navigator.pop(context);
     }
   }
 

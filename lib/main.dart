@@ -7,7 +7,7 @@ import 'screens/home_screen.dart';
 import 'screens/month_detail_screen.dart';
 import 'screens/income_screen.dart';
 import 'screens/report_screen.dart';
-import 'screens/profile_screen.dart';  // ← ADICIONADO
+import 'screens/profile_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -44,7 +44,7 @@ class MyApp extends StatelessWidget {
         '/register': (_) => RegisterScreen(),
         '/home': (_) => const HomeScreen(),
         '/report': (_) => const ReportScreen(),
-        '/profile': (_) => const ProfileScreen(),   // ← ADICIONADA
+        '/profile': (_) => const ProfileScreen(),
       },
 
       onGenerateRoute: (settings) {
